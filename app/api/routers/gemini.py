@@ -7,7 +7,7 @@ router = APIRouter(prefix="/api/v1/gemini", tags=["gemini"])
 
 # 定数定義
 MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB
-MAX_PROMPT_LENGTH = 2000
+MAX_PROMPT_LENGTH = 5000
 
 
 @router.post("/analyze", response_model=GeminiAnalyzeResponse)
@@ -44,7 +44,7 @@ async def analyze_image(
 
     if len(prompt) > MAX_PROMPT_LENGTH:
         raise HTTPException(
-            status_code=400, detail="プロンプトは2000文字以下にしてください"
+            status_code=400, detail="プロンプトは5000文字以下にしてください"
         )
 
     return await gemini_service.analyze_image(file, prompt)
