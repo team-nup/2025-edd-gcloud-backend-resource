@@ -6,8 +6,7 @@ from app.services import gemini_service
 router = APIRouter(prefix="/api/v1/gemini", tags=["gemini"])
 
 # 定数定義
-MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB
-MAX_PROMPT_LENGTH = 5000
+MAX_FILE_SIZE = 20 * 1024 * 1024  # 20MB (Gemini API上限に合わせて緩和)
 
 
 @router.post("/analyze", response_model=GeminiAnalyzeResponse)
@@ -18,8 +17,8 @@ async def analyze_image(
     """
     Gemini 2.5 Proを使用して画像とプロンプトから分析結果を生成
 
-    - **file**: 分析対象の画像ファイル（JPEG, PNG等）
-    - **prompt**: 画像に対する分析指示（例：「この画像について説明してください」）
+    - **file**: 分析対象の画像ファイル（JPEG, PNG等、最大20MB）
+    - **prompt**: 画像に対する分析指示（Gemini 2.5 Proは1M tokensまで対応）
 
     Returns:
         - **result**: AI分析結果テキスト
@@ -35,17 +34,12 @@ async def analyze_image(
     # ファイルサイズチェック
     if file.size and file.size > MAX_FILE_SIZE:
         raise HTTPException(
-            status_code=400, detail="ファイルサイズは10MB以下にしてください"
+            status_code=400, detail="ファイルサイズは20MB以下にしてください"
         )
 
-    # プロンプトの長さチェック
+    # プロンプトが空でないことを確認
     if len(prompt.strip()) == 0:
         raise HTTPException(status_code=400, detail="プロンプトが空です")
-
-    if len(prompt) > MAX_PROMPT_LENGTH:
-        raise HTTPException(
-            status_code=400, detail="プロンプトは5000文字以下にしてください"
-        )
 
     return await gemini_service.analyze_image(file, prompt)
 
