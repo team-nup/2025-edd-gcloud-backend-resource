@@ -89,7 +89,10 @@ async def analyze_image(file: UploadFile, prompt: str) -> GeminiAnalyzeResponse:
                 f"ファイル: {file.filename}, プロンプト長: {len(prompt)}文字"
             )
 
-            # Gemini 2.5 Proを呼び出し
+            # Google Search Grounding設定
+            grounding_tool = types.Tool(google_search=types.GoogleSearch())
+
+            # Gemini 2.5 Proを呼び出し（Web検索有効）
             response = client.models.generate_content(
                 model="gemini-2.5-pro",
                 contents=[
@@ -98,6 +101,9 @@ async def analyze_image(file: UploadFile, prompt: str) -> GeminiAnalyzeResponse:
                         parts=[types.Part.from_text(text=prompt), image_part],
                     )
                 ],
+                config=types.GenerateContentConfig(
+                    tools=[grounding_tool],
+                ),
             )
 
             elapsed_time = time.time() - start_time
