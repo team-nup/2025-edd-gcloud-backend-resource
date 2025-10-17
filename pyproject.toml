@@ -19,6 +19,9 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "ruff>=0.6.0",
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "httpx>=0.28.1",
 ]
 
 [tool.ruff]
@@ -84,6 +87,7 @@ ignore = [
     "E501",     # line too long (handled by formatter)
     "B008",     # do not perform function calls in argument defaults
     "PLR0913",  # too many arguments
+    "PLR2004",  # magic value in comparison (OK in tests)
     "ARG002",   # unused method argument
     "RUF002",   # docstring contains ambiguous unicode (Japanese characters)
     "RUF003",   # comment contains ambiguous unicode (Japanese characters)
@@ -96,6 +100,13 @@ unfixable = []
 
 # Allow unused variables when underscore-prefixed
 dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+# Per-file ignores
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = [
+    "S101",     # allow assert in tests
+    "PLR2004",  # allow magic values in tests
+]
 
 [tool.ruff.lint.mccabe]
 # Max complexity
@@ -116,5 +127,22 @@ line-ending = "auto"
 [dependency-groups]
 dev = [
     "pre-commit>=4.3.0",
+    "pytest>=8.4.2",
+    "pytest-asyncio>=1.2.0",
     "ruff>=0.13.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "-v",
+    "--strict-markers",
+    "--tb=short",
+]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
 ]
