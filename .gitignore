@@ -184,3 +184,6 @@ deploy.sh
 
 # Team documentation (keep local only)
 API_USAGE.md
+
+# Serena MCP (Model Context Protocol) local configuration
+.serena/
